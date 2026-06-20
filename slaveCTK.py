@@ -8,7 +8,7 @@ from codification import (
 )
 
 # Funções de conexão com a esp
-from esp_funct import connect_esp, send_ami
+from esp_funct import find_esp, send_ami
 
 # Funções de gráficos
 from grafics import generate_ami_tx_graphic
@@ -18,9 +18,11 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 class SlaveApp:
 
     def __init__(self, root, on_back_callback=None):
+# define a slave como janela principal ao escolhermos a slave como opção
         self.root = root
         self.on_back_callback = on_back_callback
 
+# textinho pra mostrar o módulo
         self.root.title("Slave - Transmissor")
         self.root.geometry("1000x800")
 
@@ -38,12 +40,13 @@ class SlaveApp:
 
         # Verifica se há conexão com uma esp via serial
         try:
-            self.esp = connect_esp()
+            self.esp = find_esp("SLAVE")
             status = "ESP conectada"
         except Exception:
             self.esp = None
             status = "ESP não conectada"
 
+        # define a fonte, pega uma mensagem usando um quadrado onde a pessoa pode escrever
         ctk.CTkLabel(
             self.root,
             text=status,
@@ -56,13 +59,14 @@ class SlaveApp:
             font=("Arial", 16, "bold")
         ).pack(pady=5)
 
+        # recebe entrada
         self.entry_message = ctk.CTkEntry(
             self.root, 
             placeholder_text="Digite a sua mensagem...",
             width=500,
         )
         self.entry_message.pack(pady=5)
-
+        # botão pra confirmar que a pessoa quer enviar a mensagem
         ctk.CTkButton(
             self.root,
             text="Enviar",
@@ -74,6 +78,7 @@ class SlaveApp:
             height=40
         ).pack(pady=10)
 
+        # configs de letras e textos pra deixar "bonito"
         self.label_cipher = ctk.CTkLabel(
             self.root,
             text="Mensagem cifrada:",
@@ -99,12 +104,15 @@ class SlaveApp:
         )
         self.label_ami.pack(anchor="w", padx=20, pady=10)
 
+        # Parte do gráfico
         self.graph_frame = ctk.CTkFrame(self.root)
         self.graph_frame.pack(fill="both", expand=True, pady=10, padx=20)
 
+#garante que ao inicializar a tela não tera um gráfico vazio aparecendo lá
         self.canvas = None 
 
     def update_graph(self, ami):
+        #carrega a figura retornada da função do grafico
         fig = generate_ami_tx_graphic(ami)
 
         if self.canvas:
@@ -122,6 +130,7 @@ class SlaveApp:
         )
 
     def process_message(self):
+    #chama as cdificações e mostra seus resultados
         message = self.entry_message.get()
 
         if not message:
@@ -165,11 +174,11 @@ class SlaveApp:
         except Exception:
             pass
 
-def run_slave(on_back=None):
+def run_slave(on_back=None):#instancia a classe ctk 
     ctk.set_appearance_mode("dark")
     root = ctk.CTk() 
 
-    app = SlaveApp(root, on_back_callback=on_back)
+    app = SlaveApp(root, on_back_callback=on_back)#janela do slave
 
     root.protocol(
         "WM_DELETE_WINDOW",

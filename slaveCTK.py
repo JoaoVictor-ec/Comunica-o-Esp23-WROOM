@@ -41,7 +41,14 @@ class SlaveApp:
         # Verifica se há conexão com uma esp via serial
         try:
             self.esp = find_esp("SLAVE")
-            status = "ESP conectada"
+            
+            # Se a função retornou algo válido (uma porta serial)
+            if self.esp:
+                status = "ESP conectada"
+            # Se a função retornou None ou vazio
+            else:
+                status = "ESP não conectada"
+                
         except Exception:
             self.esp = None
             status = "ESP não conectada"
@@ -149,8 +156,8 @@ class SlaveApp:
         )
 
         ami_text = str(ami)
-        if len(ami_text) > 150:
-            ami_text = ami_text[:150] + "..."
+        if len(ami_text) > 400:
+            ami_text = ami_text[:400] + "..."
 
         self.label_ami.configure(
             text=f"AMI: {ami_text}"

@@ -14,9 +14,25 @@ void OnDataRecv(
         dadosRecebidos += (char)incomingData[i];
     }
 
+    char macStr[18];
+
+    snprintf(
+        macStr,
+        sizeof(macStr),
+        "%02X:%02X:%02X:%02X:%02X:%02X",
+        info->src_addr[0],
+        info->src_addr[1],
+        info->src_addr[2],
+        info->src_addr[3],
+        info->src_addr[4],
+        info->src_addr[5]
+    );
+
+    Serial.print(macStr);
+    Serial.print("|");
+
     Serial.println(dadosRecebidos);
 }
-
 
 void setup()
 {

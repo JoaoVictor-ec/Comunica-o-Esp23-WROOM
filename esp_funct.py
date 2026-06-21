@@ -72,23 +72,32 @@ def receive_ami(esp):
     if esp.in_waiting == 0:
         return None
 
-    data = esp.readline().decode(
-        errors="ignore"
-    ).strip()
+    data = (
+        esp.readline()
+        .decode(errors="ignore")
+        .strip()
+    )
 
     if not data:
         return None
 
     try:
 
+        mac, ami_data = data.split("|")
+
         ami = [
             int(x)
-            for x in data.split(",")
+            for x in ami_data.split(",")
         ]
 
-        return ami
+        return {
+            "mac": mac,
+            "ami": ami
+        }
 
-    except ValueError:
+    except Exception as e:
 
-        # ignora mensagens que não sejam AMI
+        print(f"Erro ao processar AMI: {e}")
+        print(f"Dado recebido: {data}")
+
         return None

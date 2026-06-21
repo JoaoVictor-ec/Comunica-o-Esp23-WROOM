@@ -57,6 +57,18 @@ class MasterApp:
             font=("Arial", 16, "bold")
         ).pack(pady=20)
 
+        self.label_sender = ctk.CTkLabel(
+            self.root,
+            text="Origem:",
+            font=("Arial", 16, "bold")
+        )
+
+        self.label_sender.pack(
+            anchor="w",
+            padx=20,
+            pady=10
+        )
+
         self.label_ami = ctk.CTkLabel(
             self.root,
             text="AMI recebido:",
@@ -140,20 +152,25 @@ class MasterApp:
             return
 
         if self.esp:
+            packet = receive_ami(self.esp)
 
-            ami = receive_ami(self.esp)
-
-            if ami:
-                self.process_received_ami(ami)
+            if packet:
+                self.process_received_ami(
+                    packet["ami"],
+                    packet["mac"]
+                )
 
         self.root.after(100, self.check_serial)
 
-    def process_received_ami(self, ami):
+    def process_received_ami(self, ami, mac):
 
         self.update_graph(ami)#grifco
         # Mostra o AMI recebido
         self.label_ami.configure(
             text=f"AMI recebido:\n{ami}"
+        )
+        self.label_sender.configure(
+            text=f"Origem:\n{mac}"
         )
 
         # Decodifica AMI -> binário

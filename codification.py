@@ -22,10 +22,10 @@ def decodification_cifra_cesar(message):
 
 #função que transforma de string pra binário 8bits.
 def word_to_bin(mesage):
-    data = mesage.encode('latin-1')#coverte para bytes do padrão latin-1
+    data = mesage.encode('latin-1')#converte para bytes do padrão latin-1
     binary = ""
     for byte in data:
-        binary += format(byte, '08b')#converte os bytes extraidos em data para bits, fazendo substrings de 8 bits. Concatena elas pra saida.
+        binary += format(byte, '08b')#converte os bytes extraidos em 'data' para bits, fazendo substrings de 8 bits. Concatena elas pra saida.
 
     return binary
 

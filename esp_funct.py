@@ -51,7 +51,7 @@ def find_esp(device_type):
             print(e)
 
     return None
-
+#funcao para enviar uma mensagem para o ESP e receber a resposta
 def send_ami(esp, ami):
 
     if esp is None:
@@ -63,7 +63,7 @@ def send_ami(esp, ami):
         (data + "\n").encode()
     )
 
-
+#funcao para receber a resposta
 def receive_ami(esp):
 
     if esp is None:

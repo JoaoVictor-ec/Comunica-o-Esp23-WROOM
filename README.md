@@ -26,7 +26,7 @@ O objetivo é demonstrar os conceitos de Comunicação de Dados, incluindo:
 
 ## Python
 
-### CustomTkinter
+### CustomTkinter - (Pré Requisito)
 
 Biblioteca utilizada para o desenvolvimento da interface gráfica do sistema.
 

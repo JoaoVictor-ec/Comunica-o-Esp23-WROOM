@@ -87,22 +87,64 @@ void loop()
         Serial.print("Tamanho: ");
         Serial.println(dadosAMI.length());
 
-        esp_err_t result = esp_now_send(
-            broadcastAddress,
-            (uint8_t *)dadosAMI.c_str(),
-            dadosAMI.length()
-        );
+      bool sucesso = true;
 
-        if (result == ESP_OK)
-        {
-            Serial.println("Pacote enviado para ESP-NOW");
-        }
-        else
-        {
-            Serial.print("Erro no envio: ");
-            Serial.println(result);
-        }
+      const int CHUNK_SIZE = 200;
 
-        Serial.println("=================================");
+      // envia o inicio
+      esp_now_send(
+          broadcastAddress,
+          (uint8_t*)"START",
+          5
+      );
+
+      delay(20);
+
+      // envia os fragmentos
+      for (
+          int i = 0;
+          i < dadosAMI.length();
+          i += CHUNK_SIZE
+      )
+      {
+          unsigned int fim = i + CHUNK_SIZE;
+
+          if (fim > dadosAMI.length())
+          {
+              fim = dadosAMI.length();
+          }
+
+          String parte =
+              dadosAMI.substring(i, fim);
+
+          esp_err_t result = esp_now_send(
+              broadcastAddress,
+              (uint8_t*)parte.c_str(),
+              parte.length()
+          );
+
+          if (result != ESP_OK)
+          {
+              sucesso = false;
+          }
+
+          delay(20);
+      }
+
+      // envia o fim
+      esp_now_send(
+          broadcastAddress,
+          (uint8_t*)"END",
+          3
+      );
+
+      if (sucesso)
+      {
+          Serial.println("Pacotes enviados");
+      }
+      else
+      {
+          Serial.println("Erro em algum fragmento");
+      }
     }
-}
+  }

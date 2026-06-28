@@ -1,11 +1,17 @@
 #include <esp_now.h>
 #include <WiFi.h>
 
-// Callback executada quando chega uma mensagem
+// Buffer para reconstrução da mensagem
+String bufferMensagem = "";
+
+// Indica se estamos recebendo fragmentos
+bool recebendoMensagem = false;
+
 void OnDataRecv(
     const esp_now_recv_info_t *info,
     const uint8_t *incomingData,
-    int len)
+    int len
+)
 {
     String dadosRecebidos = "";
 
@@ -14,24 +20,42 @@ void OnDataRecv(
         dadosRecebidos += (char)incomingData[i];
     }
 
-    char macStr[18];
+    if (dadosRecebidos == "START")
+    {
+        bufferMensagem = "";
+        recebendoMensagem = true;
+        return;
+    }
 
-    snprintf(
-        macStr,
-        sizeof(macStr),
-        "%02X:%02X:%02X:%02X:%02X:%02X",
-        info->src_addr[0],
-        info->src_addr[1],
-        info->src_addr[2],
-        info->src_addr[3],
-        info->src_addr[4],
-        info->src_addr[5]
-    );
+    if (dadosRecebidos == "END")
+    {
+        recebendoMensagem = false;
 
-    Serial.print(macStr);
-    Serial.print("|");
+        char macStr[18];
 
-    Serial.println(dadosRecebidos);
+        snprintf(
+            macStr,
+            sizeof(macStr),
+            "%02X:%02X:%02X:%02X:%02X:%02X",
+            info->src_addr[0],
+            info->src_addr[1],
+            info->src_addr[2],
+            info->src_addr[3],
+            info->src_addr[4],
+            info->src_addr[5]
+        );
+
+        Serial.print(macStr);
+        Serial.print("|");
+        Serial.println(bufferMensagem);
+
+        return;
+    }
+
+    if (recebendoMensagem)
+    {
+        bufferMensagem += dadosRecebidos;
+    }
 }
 
 void setup()
